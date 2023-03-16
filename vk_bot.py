@@ -11,13 +11,13 @@ from main import detect_intent_texts
 
 def reply(event, vk_api, project_id):
     chat_id = event.user_id
-    reply_text = detect_intent_texts(project_id, chat_id, event.text)
-
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=reply_text,
-        random_id=random.randint(1,1000)
-    )
+    reply_text, is_fallback = detect_intent_texts(project_id, chat_id, event.text)
+    if not is_fallback:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=reply_text,
+            random_id=random.randint(1,1000)
+        )
 
 
 if __name__ == '__main__':

@@ -20,7 +20,8 @@ def detect_intent_texts(project_id, session_id, text):
     response = session_client.detect_intent(
         request={"session": session, "query_input": query_input}
     )
-    return response.query_result.fulfillment_text
+    is_fallback = response.query_result.intent.is_fallback
+    return response.query_result.fulfillment_text, is_fallback
 
 
 def start(update, context):
@@ -34,7 +35,7 @@ def start(update, context):
 
 def reply(update, context):
     reply_markup = ReplyKeyboardRemove()
-    reply_text = detect_intent_texts(project_id, chat_id, update.message.text)
+    reply_text, is_fallback = detect_intent_texts(project_id, chat_id, update.message.text)
     update.message.reply_text(
         text=reply_text,
         reply_markup=reply_markup,
