@@ -4,13 +4,10 @@ import logging
 from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
-logging.basicConfig(level=logging.INFO)
+from google.cloud import dialogflow
 
 
 def detect_intent_texts(project_id, session_id, text):
-
-    from google.cloud import dialogflow
 
     session_client = dialogflow.SessionsClient()
 
@@ -45,7 +42,7 @@ def reply(update, context):
 
 
 if __name__ == '__main__':
-
+    logging.basicConfig(level=logging.INFO)
     load_dotenv()
     bot_token = os.getenv('BOT_TOKEN')
     google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
