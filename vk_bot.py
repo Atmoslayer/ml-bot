@@ -1,4 +1,3 @@
-import vk_api
 import os
 import logging
 import random
@@ -6,7 +5,19 @@ import random
 from dotenv import load_dotenv
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-from main import detect_intent_texts
+from train_network import detect_intent_texts
+
+logging.basicConfig(level=logging.INFO)
+
+
+def vk_bot_start(vk_api):
+    vk_session = vk_api.VkApi(token=vk_token)
+    vk_api = vk_session.get_api()
+    longpoll = VkLongPoll(vk_session)
+    logging.info('VK bot started')
+    for event in longpoll.listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            reply(event, vk_api, project_id)
 
 
 def reply(event, vk_api, project_id):
@@ -27,11 +38,3 @@ if __name__ == '__main__':
     google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
     project_id = os.getenv('PROJECT_ID')
-
-    vk_session = vk_api.VkApi(token=vk_token)
-    vk_api = vk_session.get_api()
-    longpoll = VkLongPoll(vk_session)
-
-    for event in longpoll.listen():
-        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            reply(event, vk_api, project_id)

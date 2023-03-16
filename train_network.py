@@ -8,6 +8,39 @@ from google.api_core.exceptions import InvalidArgument
 from google.cloud import dialogflow
 
 
+def detect_intent_texts(project_id, session_id, text):
+
+    session_client = dialogflow.SessionsClient()
+
+    session = session_client.session_path(project_id, session_id)
+
+    text_input = dialogflow.TextInput(text=text, language_code='ru-RU')
+
+    query_input = dialogflow.QueryInput(text=text_input)
+
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    is_fallback = response.query_result.intent.is_fallback
+    return response.query_result.fulfillment_text, is_fallback
+
+
+def train_network(questions_path, project_id):
+    with open(f'{questions_path}.json', 'r', encoding='utf8') as file:
+        questions_json = file.read()
+
+    questions = json.loads(questions_json)
+    for questions_title in questions:
+        questions_sections = questions[questions_title]
+        titled_questions = questions_sections['questions']
+        titled_answer = questions_sections['answer']
+        crutch = [titled_answer, '']
+        try:
+            create_intent(project_id, questions_title, titled_questions, crutch)
+        except InvalidArgument as exception:
+            logging.warning(exception)
+
+
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
 
     intents_client = dialogflow.IntentsClient()
@@ -47,16 +80,4 @@ if __name__ == '__main__':
     chat_id = os.getenv('CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
 
-    with open(f'{questions_path}.json', 'r', encoding='utf8') as file:
-        questions_json = file.read()
 
-    questions = json.loads(questions_json)
-    for questions_title in questions:
-        questions_sections = questions[questions_title]
-        titled_questions = questions_sections['questions']
-        titled_answer = questions_sections['answer']
-        crutch = [titled_answer, '']
-        try:
-            create_intent(project_id, questions_title, titled_questions, crutch)
-        except InvalidArgument as exception:
-            logging.warning(exception)

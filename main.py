@@ -1,63 +1,41 @@
+import argparse
 import os
 import logging
+import vk_api
 
-from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from google.cloud import dialogflow
-
-
-def detect_intent_texts(project_id, session_id, text):
-
-    session_client = dialogflow.SessionsClient()
-
-    session = session_client.session_path(project_id, session_id)
-
-    text_input = dialogflow.TextInput(text=text, language_code='ru-RU')
-
-    query_input = dialogflow.QueryInput(text=text_input)
-
-    response = session_client.detect_intent(
-        request={"session": session, "query_input": query_input}
-    )
-    is_fallback = response.query_result.intent.is_fallback
-    return response.query_result.fulfillment_text, is_fallback
-
-
-def start(update, context):
-    user = update.message.from_user
-    reply_markup = ReplyKeyboardRemove()
-    update.message.reply_text(
-        text='Здравствуйте!',
-        reply_markup=reply_markup,
-    )
-
-
-def reply(update, context):
-    reply_markup = ReplyKeyboardRemove()
-    reply_text, is_fallback = detect_intent_texts(project_id, chat_id, update.message.text)
-    update.message.reply_text(
-        text=reply_text,
-        reply_markup=reply_markup,
-    )
+from vk_bot import vk_bot_start
+from train_network import train_network
+from telegram_bot import start_tg_bot
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+
+    parser = argparse.ArgumentParser(description='Bots options parser')
+    parser.add_argument('--questions_path', help='Enter path to access questions json file', type=str,
+                        default='questions')
+    parser.add_argument('-tg', '--run_telegram_bot', help='Run telegram bot', action='store_true')
+    parser.add_argument('-vk', '--run_vk_bot', help='Run vk bot', action='store_true')
+    parser.add_argument('-tr', '--run_network_training', help='Run neural network training', action='store_true')
+    arguments = parser.parse_args()
+
+    questions_path = arguments.questions_path
+    run_telegram_bot = arguments.run_telegram_bot
+    run_vk_bot = arguments.run_vk_bot
+    run_network_training = arguments.run_network_training
+
     load_dotenv()
-    bot_token = os.getenv('BOT_TOKEN')
     google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
-    chat_id = os.getenv('CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
-    updater = Updater(token=bot_token, use_context=True)
-    dispatcher = updater.dispatcher
 
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
-    updater.dispatcher.add_handler(MessageHandler(Filters.all, reply))
+    if run_network_training:
+        train_network(questions_path, project_id)
 
+    if run_vk_bot:
+        vk_bot_start(vk_api)
 
-    logging.info('The bot started')
-    updater.start_polling()
-    updater.idle()
+    if run_telegram_bot:
+        start_tg_bot()
