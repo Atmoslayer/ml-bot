@@ -19,7 +19,7 @@ def detect_intent_texts(project_id, session_id, text):
     query_input = dialogflow.QueryInput(text=text_input)
 
     response = session_client.detect_intent(
-        request={"session": session, "query_input": query_input}
+        request={'session': session, 'query_input': query_input}
     )
     is_fallback = response.query_result.intent.is_fallback
     return response.query_result.fulfillment_text, is_fallback
@@ -61,7 +61,7 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     )
 
     response = intents_client.create_intent(
-        request={"parent": parent, "intent": intent}
+        request={'parent': parent, 'intent': intent}
     )
 
     logging.info(f'Intent created: {response}')
