@@ -1,6 +1,7 @@
 import os
 import logging
 import random
+import vk_api
 
 from dotenv import load_dotenv
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -10,7 +11,7 @@ from train_network import detect_intent_texts
 logging.basicConfig(level=logging.INFO)
 
 
-def vk_bot_start(vk_api):
+def vk_bot_start(vk_api, vk_token):
     vk_session = vk_api.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
@@ -38,3 +39,4 @@ if __name__ == '__main__':
     google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
     project_id = os.getenv('PROJECT_ID')
+    vk_bot_start(vk_api, vk_token)

@@ -8,30 +8,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from train_network import detect_intent_texts
 
 
-logging.basicConfig(level=logging.INFO)
-
-
-def start_tg_bot():
-    global tg_bot_token, chat_id, project_id
-
-    load_dotenv()
-    tg_bot_token = os.getenv('TG_BOT_TOKEN')
-    chat_id = os.getenv('CHAT_ID')
-    project_id = os.getenv('PROJECT_ID')
-
-    updater = Updater(token=tg_bot_token, use_context=True)
-    dispatcher = updater.dispatcher
-
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
-    updater.dispatcher.add_handler(MessageHandler(Filters.all, reply))
-    logging.info('TG bot started')
-    updater.start_polling()
-    updater.idle()
-
-
 def start(update, context):
-    user = update.message.from_user
     reply_markup = ReplyKeyboardRemove()
     update.message.reply_text(
         text='Здравствуйте!',
@@ -47,4 +24,21 @@ def reply(update, context):
         reply_markup=reply_markup,
     )
 
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    load_dotenv()
+    tg_bot_token = os.getenv('TG_BOT_TOKEN')
+    chat_id = os.getenv('CHAT_ID')
+    project_id = os.getenv('PROJECT_ID')
+
+    updater = Updater(token=tg_bot_token, use_context=True)
+    dispatcher = updater.dispatcher
+
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
+    updater.dispatcher.add_handler(MessageHandler(Filters.all, reply))
+    logging.info('TG bot started')
+    updater.start_polling()
+    updater.idle()
 

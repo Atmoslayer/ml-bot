@@ -80,4 +80,6 @@ if __name__ == '__main__':
     chat_id = os.getenv('CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
 
+    train_network(questions_path, project_id)
+
 
