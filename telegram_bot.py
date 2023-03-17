@@ -1,11 +1,27 @@
 import logging
 import os
 
+import telegram
 from dotenv import load_dotenv
 from telegram import ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from train_network import detect_intent_texts
+
+
+class BotLogsHandler(logging.Handler):
+
+    def __init__(self, bot, admin_chat_id):
+        self.bot = bot
+        self.admin_chat_id = admin_chat_id
+        super().__init__()
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        bot.send_message(
+            chat_id=admin_chat_id,
+            text=log_entry,
+        )
 
 
 def start(update, context):
@@ -17,6 +33,7 @@ def start(update, context):
 
 
 def reply(update, context):
+    chat_id = update.message.from_user.id
     reply_markup = ReplyKeyboardRemove()
     reply_text, is_fallback = detect_intent_texts(project_id, chat_id, update.message.text)
     update.message.reply_text(
@@ -26,11 +43,20 @@ def reply(update, context):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('bot_logger')
     load_dotenv()
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
-    chat_id = os.getenv('CHAT_ID')
+    bot = telegram.Bot(token=tg_bot_token)
+    admin_chat_id = os.getenv('TG_ADMIN_CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
+
+    logger.setLevel(logging.INFO)
+    log_handler = BotLogsHandler(bot, admin_chat_id)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    log_handler.setFormatter(formatter)
+    log_handler.setLevel(logging.INFO)
+
+    logger.addHandler(log_handler)
 
     updater = Updater(token=tg_bot_token, use_context=True)
     dispatcher = updater.dispatcher
@@ -38,7 +64,7 @@ if __name__ == '__main__':
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
     updater.dispatcher.add_handler(MessageHandler(Filters.all, reply))
-    logging.info('TG bot started')
+    logger.info('The bot started')
     updater.start_polling()
     updater.idle()
 

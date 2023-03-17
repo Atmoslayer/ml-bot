@@ -8,14 +8,26 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 from train_network import detect_intent_texts
 
-logging.basicConfig(level=logging.INFO)
+
+class BotLogsHandler(logging.Handler):
+
+    def __init__(self, admin_chat_id, vk_api):
+        self.admin_chat_id = admin_chat_id
+        self.vk_api = vk_api
+        super().__init__()
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        vk_api.messages.send(
+            user_id=admin_chat_id,
+            message=log_entry,
+            random_id=random.randint(1, 1000)
+        )
 
 
-def vk_bot_start(vk_api, vk_token):
-    vk_session = vk_api.VkApi(token=vk_token)
-    vk_api = vk_session.get_api()
+def vk_bot_start(vk_api, vk_session):
     longpoll = VkLongPoll(vk_session)
-    logging.info('VK bot started')
+    logger.info('VK bot started')
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             reply(event, vk_api, project_id)
@@ -33,10 +45,23 @@ def reply(event, vk_api, project_id):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('bot_logger')
+
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
     google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
     project_id = os.getenv('PROJECT_ID')
-    vk_bot_start(vk_api, vk_token)
+    admin_chat_id = os.getenv('VK_ADMIN_CHAT_ID')
+
+    logger.setLevel(logging.INFO)
+    log_handler = BotLogsHandler(admin_chat_id, vk_api)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    log_handler.setFormatter(formatter)
+    log_handler.setLevel(logging.INFO)
+
+    logger.addHandler(log_handler)
+
+    vk_session = vk_api.VkApi(token=vk_token)
+    vk_api = vk_session.get_api()
+    vk_bot_start(vk_api, vk_session)
