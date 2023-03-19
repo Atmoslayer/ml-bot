@@ -49,8 +49,6 @@ def main(vk_api):
 
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
-    google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
     project_id = os.getenv('PROJECT_ID')
     admin_chat_id = os.getenv('VK_ADMIN_CHAT_ID')
 

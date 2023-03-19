@@ -74,7 +74,6 @@ def main():
     questions_path = arguments.questions_path
 
     load_dotenv()
-    chat_id = os.getenv('TG_ADMIN_CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
 
     train_network(questions_path, project_id)
