@@ -18,14 +18,14 @@ class BotLogsHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
-        vk_api.messages.send(
-            user_id=admin_chat_id,
+        self.vk_api.messages.send(
+            user_id=self.admin_chat_id,
             message=log_entry,
             random_id=random.randint(1, 1000)
         )
 
 
-def vk_bot_start(vk_api, vk_session):
+def vk_bot_start(vk_api, vk_session, project_id, logger):
     longpoll = VkLongPoll(vk_session)
     logger.info('VK bot started')
     for event in longpoll.listen():
@@ -44,7 +44,7 @@ def reply(event, vk_api, project_id):
         )
 
 
-if __name__ == '__main__':
+def main(vk_api):
     logger = logging.getLogger('bot_logger')
 
     load_dotenv()
@@ -54,6 +54,9 @@ if __name__ == '__main__':
     project_id = os.getenv('PROJECT_ID')
     admin_chat_id = os.getenv('VK_ADMIN_CHAT_ID')
 
+    vk_session = vk_api.VkApi(token=vk_token)
+    vk_api = vk_session.get_api()
+
     logger.setLevel(logging.INFO)
     log_handler = BotLogsHandler(admin_chat_id, vk_api)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -62,6 +65,8 @@ if __name__ == '__main__':
 
     logger.addHandler(log_handler)
 
-    vk_session = vk_api.VkApi(token=vk_token)
-    vk_api = vk_session.get_api()
-    vk_bot_start(vk_api, vk_session)
+    vk_bot_start(vk_api, vk_session, project_id, logger)
+
+
+if __name__ == '__main__':
+    main(vk_api)

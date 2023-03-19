@@ -1,7 +1,8 @@
 import logging
 import os
-
 import telegram
+
+from functools import partial
 from dotenv import load_dotenv
 from telegram import ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -18,8 +19,8 @@ class BotLogsHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
-        bot.send_message(
-            chat_id=admin_chat_id,
+        self.bot.send_message(
+            chat_id=self.admin_chat_id,
             text=log_entry,
         )
 
@@ -32,7 +33,7 @@ def start(update, context):
     )
 
 
-def reply(update, context):
+def reply(update, context, project_id):
     chat_id = update.message.from_user.id
     reply_markup = ReplyKeyboardRemove()
     reply_text, is_fallback = detect_intent_texts(project_id, chat_id, update.message.text)
@@ -42,7 +43,7 @@ def reply(update, context):
     )
 
 
-if __name__ == '__main__':
+def main():
     logger = logging.getLogger('bot_logger')
     load_dotenv()
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
@@ -63,8 +64,11 @@ if __name__ == '__main__':
 
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
-    updater.dispatcher.add_handler(MessageHandler(Filters.all, reply))
+    updater.dispatcher.add_handler(MessageHandler(Filters.all, partial(reply, project_id=project_id)))
     logger.info('The bot started')
     updater.start_polling()
     updater.idle()
 
+
+if __name__ == '__main__':
+   main()

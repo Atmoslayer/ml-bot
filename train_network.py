@@ -66,10 +66,10 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     logging.info(f'Intent created: {response}')
 
 
-if __name__ == '__main__':
-
+def main():
     parser = argparse.ArgumentParser(description='Questions path parser')
-    parser.add_argument('--questions_path', help='Enter path to access questions json file', type=str, default='questions')
+    parser.add_argument('--questions_path', help='Enter path to access questions json file', type=str,
+                        default='questions')
     arguments = parser.parse_args()
     questions_path = arguments.questions_path
 
@@ -78,5 +78,10 @@ if __name__ == '__main__':
     project_id = os.getenv('PROJECT_ID')
 
     train_network(questions_path, project_id)
+
+
+if __name__ == '__main__':
+    main()
+
 
 
