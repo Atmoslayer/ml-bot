@@ -74,8 +74,6 @@ if __name__ == '__main__':
     questions_path = arguments.questions_path
 
     load_dotenv()
-    google_token = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
     chat_id = os.getenv('TG_ADMIN_CHAT_ID')
     project_id = os.getenv('PROJECT_ID')
 
