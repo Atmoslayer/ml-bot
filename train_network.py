@@ -30,12 +30,12 @@ def train_network(questions_path, project_id):
         questions_json = file.read()
 
     questions = json.loads(questions_json)
-    for questions_title in questions:
-        titled_questions = questions[questions_title]['questions']
-        titled_answer = questions[questions_title]['answer']
-        crutch = [titled_answer, '']
+    for title, attributes in questions.items():
+        questions = attributes['questions']
+        answer = attributes['answer']
+        crutch = [answer, '']
         try:
-            create_intent(project_id, questions_title, titled_questions, crutch)
+            create_intent(project_id, title, questions, crutch)
         except InvalidArgument as exception:
             logging.warning(exception)
 
