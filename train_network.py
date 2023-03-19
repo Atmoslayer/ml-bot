@@ -31,9 +31,8 @@ def train_network(questions_path, project_id):
 
     questions = json.loads(questions_json)
     for questions_title in questions:
-        questions_sections = questions[questions_title]
-        titled_questions = questions_sections['questions']
-        titled_answer = questions_sections['answer']
+        titled_questions = questions[questions_title]['questions']
+        titled_answer = questions[questions_title]['answer']
         crutch = [titled_answer, '']
         try:
             create_intent(project_id, questions_title, titled_questions, crutch)
