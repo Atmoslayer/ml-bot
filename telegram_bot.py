@@ -9,6 +9,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from train_network import detect_intent_texts
 
+logger = logging.getLogger('bot_logger')
 
 class BotLogsHandler(logging.Handler):
 
@@ -44,7 +45,6 @@ def reply(update, context, project_id):
 
 
 def main():
-    logger = logging.getLogger('bot_logger')
     load_dotenv()
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
     bot = telegram.Bot(token=tg_bot_token)

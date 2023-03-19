@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from google.cloud import dialogflow
 
+logging.basicConfig(level=logging.INFO)
+
 
 def detect_intent_texts(project_id, session_id, text):
 

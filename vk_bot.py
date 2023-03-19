@@ -8,6 +8,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 from train_network import detect_intent_texts
 
+logger = logging.getLogger('bot_logger')
 
 class BotLogsHandler(logging.Handler):
 
@@ -45,8 +46,6 @@ def reply(event, vk_api, project_id):
 
 
 def main(vk_api):
-    logger = logging.getLogger('bot_logger')
-
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
     project_id = os.getenv('PROJECT_ID')
