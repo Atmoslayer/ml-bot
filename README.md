@@ -84,5 +84,23 @@ python3 train_network.py --questions_path C:\Users\atmoslayer\questions.json
 ```
 Если создаваемый набор уже существует в проекте, его создание будет пропущено и в консоль будет выдано
 соответствующее уведомление.
+## Запуск с помощью docker
+Проект содержит dockerfile, позволяющий создать образ и контейнер для проекта.
+Docker должен быть установлен и запущен.
+Для создания образа используйте `docker build` с указанием имени образа через `-t`:
+```commandline
+docker build . -t ml_bot
+```
+Для создания контейнеров используйте `docker run` с указанием имени контейнера через `--name`, указанием пути к .env файлу чере- `--env-file` 
+и аргументом для запуска соответствующего бота.
+### Запуск телеграм бота через docker
+```commandline
+docker run --name telegram_bot --env-file=./.env -it ml_bot python telegram_bot.py
+```
+### Запуск ВК бота через docker
+```commandline
+docker run --name vk_bot --env-file=./.env -it ml_bot python vk_bot.py
+```
+После создания контейнеры с ботами будут запущены и готовы к работе.
 ## Цель проекта
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков [dvmn.org](https://dvmn.org/).
