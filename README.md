@@ -45,17 +45,17 @@ VK_TOKEN=vk1.a.4-Abcdfghij_klmnOp...gdf
 ```
 Python3 должен быть уже установлен.
 Затем используйте `pip` (или `pip3`, если есть конфликт с Python2) для установки зависимостей:
-```
+```commandline
 pip install -r requirements.txt
 ```
 ## Запуск телеграм бота
 Бот запускается командой:
-```
+```commandline
 python3 telegram_bot.py           
 ```
 ## Запуск ВК бота
 Бот запускается командой:
-```
+```commandline
 python3 vk_bot.py           
 ```
 ## Запуск обучения нейросети
@@ -79,7 +79,7 @@ python3 vk_bot.py
 ```
 Путь к файлу указывается с помощью аргумента `--questions_path` (по умолчанию указано questions).
 Обучение запускается следующей командой:
-```
+```commandline
 python3 train_network.py --questions_path C:\Users\atmoslayer\questions.json
 ```
 Если создаваемый набор уже существует в проекте, его создание будет пропущено и в консоль будет выдано
@@ -100,6 +100,13 @@ docker run --name telegram_bot --env-file=./.env -it ml_bot python telegram_bot.
 ### Запуск ВК бота через docker
 ```commandline
 docker run --name vk_bot --env-file=./.env -it ml_bot python vk_bot.py
+```
+### Запуск обучения нейросети через docker
+Для обучения нейросети потребуется создать отдельный контейнер, который завершит работу по оконачании обучения.
+Путь к файлу с вопросами указывается с помощью аргумента `--questions_path` (по умолчанию указано questions).
+Используйте команду:
+```commandline
+docker run --name train_network --env-file=./.env -it train_network python train_network.py --questions_path C:\Users\atmoslayer\questions.json
 ```
 После создания контейнеры с ботами будут запущены и готовы к работе.
 ## Цель проекта
